@@ -81,7 +81,7 @@ class AccountMoveImport(models.TransientModel):
         return action
 
     def clean_strip_pivot(self, pivot):
-        for l in pivot:  # noqa: E741
+        for l in pivot:
             for key, value in l.items():
                 if value:
                     if isinstance(value, str):
@@ -96,7 +96,7 @@ class AccountMoveImport(models.TransientModel):
         force_journal_code = (
             self.force_journal_id and self.force_journal_id.code or False
         )
-        for l in pivot:  # noqa: E741
+        for l in pivot:
             if force_move_date:
                 l["date"] = force_move_date
             if force_move_line_name:
@@ -167,7 +167,7 @@ class AccountMoveImport(models.TransientModel):
         res = []
         year_str = ""
         i = 0
-        for l in reader:  # noqa: E741
+        for l in reader:
             i += 1
             if i == 1 and l["discount"]:
                 year_str = l["discount"][0:4]
@@ -248,7 +248,7 @@ class AccountMoveImport(models.TransientModel):
             "analytic_account_2": self.env._("analytic account codes"),
         }
         errors = {"other": []}
-        for key in key2label.keys():
+        for key in key2label:
             errors[key] = {}
 
         def match_account(line, speed_dict, id_field, code_field):
@@ -276,7 +276,7 @@ class AccountMoveImport(models.TransientModel):
                 errors[code_field].setdefault(line[code_field], []).append(line["line"])
 
         # MATCHES + CHECKS
-        for l in pivot:  # noqa: E741
+        for l in pivot:
             assert l.get("line") and isinstance(l.get("line"), int), (
                 "missing line number"
             )
@@ -360,7 +360,7 @@ class AccountMoveImport(models.TransientModel):
         prec = self.env.company.currency_id.rounding
         seq = self.env["ir.sequence"].next_by_code("account.move.import")
         cur_move = {}
-        for l in pivot:  # noqa: E741
+        for l in pivot:
             indicator = l.get("indicator", False)
             if cur_date == l["date"]:
                 cur_move["line_ids"].append(
