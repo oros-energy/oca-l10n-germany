@@ -2,7 +2,6 @@
 # @author Alexis de Lattre <alexis.delattre@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import base64
 import csv
 import logging
 from datetime import date as datelib
@@ -50,7 +49,7 @@ class AccountMoveImport(models.TransientModel):
 
     def run_import(self):
         self.ensure_one()
-        file_bytes = base64.b64decode(self.file_to_import)
+        file_bytes = self.file_to_import.content
         pivot = self.genericcsv2pivot(file_bytes)
         _logger.debug("pivot before update: %s", pivot)
         self.clean_strip_pivot(pivot)
@@ -166,15 +165,13 @@ class AccountMoveImport(models.TransientModel):
         )
         res = []
         year_str = ""
-        i = 0
-        for l in reader:
-            i += 1
+        for i, l in enumerate(reader, start=1):
             if i == 1 and l["discount"]:
                 year_str = l["discount"][0:4]
             if i >= 3:
                 date_str = l["date"][0:2] + "/" + l["date"][-2:] + "/" + year_str
                 try:
-                    date = datetime.strptime(date_str, self.date_format)
+                    date = datetime.strptime(date_str, self.date_format)  # noqa: DTZ007
                 except Exception as error:
                     raise UserError(
                         (  # pylint: disable=translation-not-lazy
@@ -300,8 +297,8 @@ class AccountMoveImport(models.TransientModel):
             else:
                 if not isinstance(l.get("date"), datelib):
                     try:
-                        l["date"] = datetime.strptime(l["date"], "%Y-%m-%d")
-                    except Exception:
+                        l["date"] = datetime.strptime(l["date"], "%Y-%m-%d")  # noqa: DTZ007
+                    except (TypeError, ValueError):
                         errors["other"].append(
                             self.env._("Line %(line)d: bad date format %(date)s") % l  # pylint: disable=translation-not-lazy
                         )

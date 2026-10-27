@@ -1,11 +1,11 @@
 # Copyright 2023 Hunki Enterprises BV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 import logging
-from base64 import b64encode
 
 from odoo import exceptions
 from odoo.fields import Domain
 from odoo.tests import tagged
+from odoo.tools import BinaryBytes
 from odoo.tools.misc import file_open
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
@@ -68,7 +68,9 @@ class TestDatevImportCsvDtvf(AccountTestInvoicingCommon):
     def _test_wizard(self, filename):
         wizard = self.env["account.move.import"].create(
             {
-                "file_to_import": b64encode(file_open(filename).read().encode("utf8")),
+                "file_to_import": BinaryBytes(
+                    file_open(filename).read().encode("utf8")
+                ),
                 "force_journal_id": self.env["account.journal"]
                 .search([("type", "=", "sale")], limit=1)
                 .id,
@@ -99,7 +101,7 @@ class TestDatevImportCsvDtvf(AccountTestInvoicingCommon):
     def test_wizard_broken_file(self):
         wizard = self.env["account.move.import"].create(
             {
-                "file_to_import": b64encode(
+                "file_to_import": BinaryBytes(
                     b"file,with\nwrong\ndate,format,in,third,line,,,,,wrong date"
                 ),
                 "force_journal_id": self.env["account.journal"]
@@ -115,7 +117,7 @@ class TestDatevImportCsvDtvf(AccountTestInvoicingCommon):
     def test_nonexisting_account_journal(self):
         wizard = self.env["account.move.import"].create(
             {
-                "file_to_import": b64encode(
+                "file_to_import": BinaryBytes(
                     b"EXTF,700,22,Buchungsstapel,12,20230417083808874,,,,,12345,1234,20220101,"
                     b"4,20221201,20221231,Buchungsstapel 20220101,MM,1,,,EUR,"
                     b"\nnonexisting,accounts\n42,H,,,,,42424242,424242420,,23/01"

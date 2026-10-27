@@ -1,0 +1,2 @@
+id,name,model_id,group_id/id,operation,domain
+access_account_move_import,access_account_move_import,account.move.import,base.group_user,cru,
